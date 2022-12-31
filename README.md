@@ -4,7 +4,7 @@ Maxwell Bakalos
 (Personal Project)
 (These programs were written in MATLAB but may be converted to another language such as Python later)
 
-
+![This is an image](https://raw.githubusercontent.com/maxbak753/Media-Effects-Programs/master/Figure%201%20-%20Image%20Transform%20Reconstructor%20process%20using%20the%20Discrete%20Cosine%20Transform.PNG?token=GHSAT0AAAAAAB4HV652KBARHTW6U3IOGWBMY5QY43A)
 Figure 1 - Image Transform Reconstructor process using the Discrete Cosine Transform
 
 ## MEDIA TRANSFORM RECONSTRUCTORS
