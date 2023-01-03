@@ -4,19 +4,90 @@
 
 clear % clear previous values
 
+
 % ********************
 % PARAMETERS ************
 % ***************************
 
-% Video frame amount
-frames = 24*20;
+% Dialog Box for Input Parameters
+dlg_title = "Visual Noise Video Creator Parameters";
+prompt = {'1.  \bfFrame Rate:', ...
+    '2.  \bf# of Video Frames:', ...
+    '3.  \bfTotal Video Frame Dimensions: \rm(space seperated values) "Horizontal Vertical"', ...
+    '4.  \bfNoise Dimensions: \rm(space seperated values) "Horizontal Vertical"', ...
+    '5.  \bfBlank Space Color Value: \rm(0-1 range, 1 = uniform) (space seperated values) "\color{red}Red \color{green}Green \color{blue}Blue"', ...
+    '6.  \bfNoise Color Dimension: \rm0 \rightarrow Black & White, 1 \rightarrow Color', ...
+    '7.  \bfNoise Types: \rm0 \rightarrow uniform, 1 \rightarrow gaussian', ...
+    '8.  \bfRGB Color balance: \rm(0-1 range, 1 = uniform) (space seperated values) "\color{red}Red \color{green}Green \color{blue}Blue"', ...
+    '9.  \bfMean & Variance: \rm(gaussian noise) (space seperated values) "Mean Variance"', ...
+    '10. \bfSaturation: \rm0 \rightarrow none, 1 \rightarrow full'};
+dlg_dims = [1,90];
+definput = {'24','120','160 90','64 36','1 1 1','1','1','1 1 1','0.6 0.1', '0'};
+opts.Interpreter = 'tex'; opts.Resize = 'on';
+input_params = inputdlg(prompt,dlg_title,dlg_dims,definput,opts);
+
+% Dialog Box for Video Profile (file type)
+profiles = {'Archival','Motion JPEG AVI','Motion JPEG 2000','MPEG-4', ...
+            'Uncompressed AVI','Indexed AVI','Grayscale AVI'};
+[lst_ind,~] = listdlg('PromptString', {'Select a Video File Format', '(Recommended: MPEG-4 or ','Uncompressed AVI):'}, ...
+                      'SelectionMode', 'single', 'InitialValue', 4, ...
+                      'ListSize',[150,100], ...
+                      'ListString', profiles);
+
+% Frame Rate
+frame_r8 = str2double(input_params{1});
+
+% # of Video Frames
+frames = str2double(input_params{2});
 
 % Total Video Frame Dimensions
-horiz_total = 160;
-verti_total = 90;
+dims_tot = str2num(input_params{3});
+horiz_total = dims_tot(1);
+verti_total = dims_tot(2);
 % Noise Dimensions
-horiz = 160;
-verti = 90;
+dims_noi = str2num(input_params{4});
+horiz = dims_noi(1);
+verti = dims_noi(2);
+
+% Blank Space Color Value;
+rgb_blank = str2num(input_params{5});
+r_pad = rgb_blank(1);  % red
+g_pad = rgb_blank(2);  % green
+b_pad = rgb_blank(3);  % blue
+
+% Color Dimensions: 0 -> Black & White, 1 -> Color
+bw_rgb = str2double(input_params{6});
+
+% Noise Types - - - - - - - - - - - -
+% 0 -> uniform, 1 -> gaussian
+type = str2double(input_params{7});
+
+% Color balance (1 = uniform)
+rgb_noi = str2num(input_params{8});
+r = rgb_noi(1);  % red
+g = rgb_noi(2);  % green
+b = rgb_noi(3);  % blue
+
+% Mean & Variance (gaussian noise)
+mean_var = str2num(input_params{9});
+mean = mean_var(1);
+var = mean_var(2);
+% - - - - - - - - - - - - - - - - - -
+
+% Saturation: 0 -> none, 1 -> full
+saturated = str2double(input_params{10});
+
+% Video Profile (File Type)
+selected_profile = profiles{lst_ind};
+
+% ***************************
+% PARAMETERS ************
+% ********************
+
+
+%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% INPUT ERROR CHECKING %%%%%%%%
 
 % Check Dimensions & Fix If Incorrect
 if (horiz_total <= horiz)
@@ -41,35 +112,9 @@ if ( rem(verti_pad,2) )
     fprintf("FIXING ERROR: Padded vertical distance is not an even number!")
     verti_pad = verti_pad + 1;  % set to nearest even #
 end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%
 
-% Blank space color value;
-r_pad = 1;  % red
-g_pad = 1;  % green
-b_pad = 1;  % blue
-
-% Black & White (0) or Color (1)
-bw_rgb = 1;
-
-% Noise Types - - - - - - - - - - - -
-% 0 -> uniform, 1 -> gaussian
-type = 1;
-
-% Color balance (1 = uniform)
-r = 1;  % red
-g = 1;  % green
-b = 1;  % blue
-
-% Mean & Variance (gaussian noise)
-mean = 0.6;
-var = 0.1;
-% - - - - - - - - - - - - - - - - - -
-
-% Saturation: 0 -> none, 1 -> full
-saturated = 0;
-
-% ***************************
-% PARAMETERS ************
-% ********************
 
 % Title - - -
 % BW or RGB
@@ -90,9 +135,9 @@ pic_name = strcat(type_name, '_noise_', bw_rgb_name, '_mean', num2str(mean), '_v
 fprintf(strcat(pic_name,'\n'))
 
 % Create objects to write the video
-v_writer = VideoWriter(pic_name, 'Uncompressed AVI');
+v_writer = VideoWriter(pic_name, selected_profile);
 % Assign frame rate
-v_writer.FrameRate = 24;
+v_writer.FrameRate = frame_r8;
 % Assign video Quality
 %v_writer.Quality = 100;
 % Open the AVI file for writing
@@ -104,14 +149,21 @@ v_verti = verti + verti_pad;
 
 % Dimensions vector
 dim = [verti, horiz];
-% Preallocate image
-if (bw_rgb == 0)
-    im = zeros(verti, horiz);
 
-    bw_pad = rgb2gray([r_pad,g_pad,b_pad]);
-    im_pad = bw_pad(1,1) * ones(v_verti, v_horiz);
-elseif (bw_rgb == 1)
-    im = zeros(verti, horiz, 3);
+% Check if background color is grayscale (0 -> BW, 1 -> RGB)
+bckrnd_BWorRGB = not((r_pad == g_pad) & (g_pad == b_pad));
+
+% Preallocate image
+% If the background & noise are both grayscale ...
+if ((bw_rgb == 0) && (bckrnd_BWorRGB == 0))
+    im = zeros(dim);
+
+    %bw_pad = rgb2gray([r_pad,g_pad,b_pad]);
+    %im_pad = bw_pad(1,1) * ones(v_verti, v_horiz);
+    im_pad = r_pad * ones(v_verti, v_horiz);
+
+else % if one of them is color ...
+    im = zeros([dim, 3]);
     blank_image = ones(v_verti, v_horiz);
     im_pad(:,:,1) = (r_pad * blank_image); 
     im_pad(:,:,2) = (g_pad * blank_image); 
@@ -124,9 +176,13 @@ end
 
 
 for f = 1:frames
-    
+
     % Reset image
-    im = zeros(verti, horiz, 3);
+    if (bw_rgb == 0)
+        im = zeros(dim);
+    elseif (bw_rgb == 1)
+        im = zeros([dim, 3]);
+    end
 
     % Create Image
     if (type == 0)
@@ -157,13 +213,25 @@ for f = 1:frames
     verti_pad_half = verti_pad / 2;
     horiz_pad_half = horiz_pad / 2;
 
+
     % Create final padded image frame
     im_final = im_pad;  % set entire frame to blank background pad
-    % set middle region to noise image
-    if (bw_rgb == 0)
+
+    % ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` `
+    % Set Middle Region to Noise Image ` ` ` ` ` ` ` ` ` `
+
+    % If the background & noise are both grayscale ...
+    if ((bw_rgb == 0) && (bckrnd_BWorRGB == 0))
         im_final((verti_pad_half+1):(verti_pad_half+verti), ...
                  (horiz_pad_half+1):(horiz_pad_half+horiz)) = im(:,:);
-    elseif (bw_rgb == 1)
+
+    elseif (bckrnd_BWorRGB == 1) % if the background is color
+
+        if (bw_rgb == 0) % if the noise is grayscale
+            % Make the pixels in RGB & set each RGB value to the same #
+            im = repmat(im,1,1,3);
+        end
+
         im_final((verti_pad_half+1):(verti_pad_half+verti), ...
                  (horiz_pad_half+1):(horiz_pad_half+horiz), 1) = im(:,:,1);
         im_final((verti_pad_half+1):(verti_pad_half+verti), ...
