@@ -4,7 +4,8 @@ Maxwell Bakalos
 (Personal Project)
 (These programs were written in MATLAB but may be converted to another language such as Python later)
 
-![This is an image](https://raw.githubusercontent.com/maxbak753/Media-Effects-Programs/master/Figure%201%20-%20Image%20Transform%20Reconstructor%20process%20using%20the%20Discrete%20Cosine%20Transform.PNG?token=GHSAT0AAAAAAB4HV652KBARHTW6U3IOGWBMY5QY43A)
+<img src="https://github.com/maxbak753/Media-Effects-Programs/blob/master/Images%20%26%20Videos%20%26%20etc/Figure%201%20-%20Image%20Transform%20Reconstructor%20process%20using%20the%20Discrete%20Cosine%20Transform.PNG" width=70% height=70%>
+
 *Figure 1 - Image Transform Reconstructor process using the Discrete Cosine Transform*
 
 ## MEDIA TRANSFORM RECONSTRUCTORS
@@ -25,6 +26,13 @@ Maxwell Bakalos
 ## OTHERS
 ### Noise Creators (Audio, Image, Video)
  #### Audio_Noise_Creator.m, Image_Noise_Creator.m, Image_Noise_Video_Creator.m
+ 
+https://user-images.githubusercontent.com/114166327/210305704-67a31d67-1693-4cdd-8baf-7a03ffb453bb.mp4
+
+https://user-images.githubusercontent.com/114166327/210305709-8be2e5a6-94e0-4481-b056-a783782248c7.mp4
+
+*Figure 2 - Noise Videos with colored borders*
+
 	These three programs can either create an audio file, image, or video of random noise. The noise can be gaussian random noise with a specified mean and variance, and a color balance (image/video), or it can be saturated to be only 0 or 1. I have also added the feature that this noise can be bounded either by a certain sine wave frequency (audio) or color (image/video).
 
 
@@ -34,4 +42,9 @@ Maxwell Bakalos
 
 ### Image Clusterer
 #### Image_Clusterer.m
+<img src="https://github.com/maxbak753/Media-Effects-Programs/blob/master/Images%20%26%20Videos%20%26%20etc/bu2010.tif__2_clstrs_L2.png" width=40% height=40%>
+<img src="https://github.com/maxbak753/Media-Effects-Programs/blob/master/Images%20%26%20Videos%20%26%20etc/bu2010.tif__3_clstrs_L2.png" width=40% height=40%>
+
+*Figure 3 - Clustered Images: (Top) 2 clusters & (Bottom) 3 clusters*
+
 	This program takes an image as an input and outputs a “clustered” version of the image. It uses the k-Means clustering algorithm on the pixel values of the image to cluster the pixels into groups of similar colors, then maps each group to a specific output color in order to get an effect similar to the “posterize” effect in many image/video editors. It essentially re-quantizes the pixel values into groups based on the clustering algorithm.
