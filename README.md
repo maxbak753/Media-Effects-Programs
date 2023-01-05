@@ -2,6 +2,8 @@
 Maxwell Bakalos <br>
 12/31/2022 <br>
 (Personal Project) <br>
+Google Drive Link: https://drive.google.com/drive/u/8/folders/1pX9FPfNBxxTfFaG61_FqUqNa2ocdUcmA <br>
+YouTube Link: https://www.youtube.com/watch?v=Y5G0OFM3ROM&list=PLow3V-UtGcytRPun9l7XUO07yE7ezbuLp <br>
 (These programs were written in MATLAB but may be converted to another language such as Python later)
 
 ## MEDIA TRANSFORM RECONSTRUCTORS
