@@ -16,11 +16,12 @@ dlg_title = "Image Clusterer Input Parameters ~('o')~";
 prompt = {'# of Clusters to Find, k = ?:', ...
     'Distance Metric (Lq Norm Distance), q = ?: (1 or 2)', ...
     'Convergence Threshold (cluster center position change):', ...
-    'Toggle: use pixel components seperately or together (color images): (0 -> together, 1 -> seperate)' ...
+    'Toggle: use pixel components seperately or together (color images): (0 -> seperate, 1 -> together)' ...
+    "Toggle for location usage (0 -> don't use, 1 -> use)", ...
     'Image File Type Extension:'};
-dims = [1 60];
-definput = {'3','2','0.025','1','png'};
-input_params = inputdlg(prompt,dlg_title,dims,definput,"on");
+dlg_dims = [1 60];
+definput = {'3','2','0.025','0','0','png'};
+input_params = inputdlg(prompt,dlg_title,dlg_dims,definput,"on");
 
 % # of Clusters to Find
 k = str2double(input_params{1});
@@ -32,12 +33,16 @@ q = str2double(input_params{2});
 % to be considered converged
 convergence_threshold = str2double(input_params{3});
 
-% Toggle For USing all RGB components spereately or together 
-% (0 -> together, 1 -> seperate)
+% Toggle for Using All RGB Components Seperately or Together 
+% (0 -> seperate, 1 -> together)
 components_use = str2double(input_params{4});
 
+% Toggle for location usage
+% (0 -> don't use, 1 -> use)
+loc_use = str2double(input_params{5});
+
 % Image File Type Extension:
-file_type = input_params{5};
+file_type = input_params{6};
 
 % >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%~
@@ -46,53 +51,115 @@ file_type = input_params{5};
 % Set reshaped image dimensions based on color of grayscale original
 % color
 if ( length(size(im)) ~= 2 )
-    dim_im = size(im,3);
+    dim_im_color = size(im,3);
 % grayscale
 else
-    dim_im = 1;
+    dim_im_color = 1;
+end
+
+% If Pixel Location is Being Used for Clustering
+if (loc_use == 1)
+    % Create coordiante grids for pixel location values
+    [X,Y] = meshgrid(1:size(im,2),1:size(im,1));
+
+    %[X,Y] = meshgrid((-size(im,2)/2):(size(im,2)/2)-1, (-size(im,1)/2):(size(im,1)/2)-1);
+    %Y = fliplr(Y);
+    %X = X/(size(im,2)/100);
+    %Y = Y/(size(im,1)/100);
+    X = X/2.9;
+    Y = Y/2.9;
+
+
+    % Concatenate X & Y values to each pixel
+    im_mod = cat(3,double(im),X,Y);
+    % Update pixel dimension
+    dim_im_pxl = dim_im_color + 2;
+else
+    im_mod = double(im);
+    dim_im_pxl = dim_im_color;
 end
 
 % Reshape Image: 
 % pixels -> rows, color brightness value(s) -> column(s)
-im_reshape = double(reshape(im,[], dim_im));
+im_reshape = double(reshape(im_mod,[], dim_im_pxl));
 
+%{
 % If all color components are use together . . .
 if (components_use == 0)
     % set dimensions to grayscale
-    dim_im = 1;
+    dim_im_color = 1;
+end
+%}
+means_init = zeros(k,size(im_reshape,2)); % preallocate
+% Initialize Means ~~~~~~
+
+% For each cluster . . .
+for ik = 1:k
+    % Choose a random pixel as an initial mean
+    means_init(ik,:) = im_reshape(randi([1,length(im_reshape)]), :);
 end
 
-means_init = zeros(k,size(im_reshape,2)); % preallocate
-% Initialize Means
-for i = 1:k
-    means_init(i,:) = im_reshape(randi([1,length(im_reshape)]));
-end
 
 % Preallocate
-means = zeros(k, dim_im);
-labels = zeros(size(im_reshape,1), dim_im);
-% Calculate Clusters
-for i = 1:dim_im
-    [means(:,i), labels(:,i), ~, ~] = kMeans(k, q, convergence_threshold, im_reshape(:,i), means_init(:,i));
-end
+means = zeros(k, dim_im_color);
+labels = zeros(size(im_reshape,1), dim_im_color);
 
+% If color components are used seperately AND locations are not used. . .
+if ((components_use == 0) && (loc_use == 0))
+    % For each component of color . . .
+    for i = 1:dim_im_color
+        % Calculate Clusters
+        [means(:,i), labels(:,i), ~, ~] = kMeans(k, q, convergence_threshold, im_reshape(:,i), means_init(:,i));
+    end
+%~
+% If all color components are used together AND locations are not used . . .
+elseif ((components_use == 1) && (loc_use == 0))
+    % Calculate Clusters
+    [means, labels, ~, ~] = kMeans(k, q, convergence_threshold, im_reshape, means_init);
+    labels = repmat(labels,1,3);
+%~
+% If all color components are used seperately AND locations are used . . .
+elseif ((components_use == 0) && (loc_use == 1))
+    % For each component of color . . .
+    for i = 1:dim_im_color
+        % i color index, x index, y index
+        i_xy = [i,dim_im_pxl-1,dim_im_pxl];
+        % Calculate Clusters
+        [me, la, ~, ~] = kMeans(k, q, convergence_threshold, im_reshape(:,i_xy), means_init(:,i_xy));
+        means(:,i) = me(:,1);
+        labels(:,i) = la;
+    end
+%~
+% If all color components are used together AND locations are used . . .
+elseif ((components_use == 1) && (loc_use == 1))
+    % Calculate Clusters
+    [me, la, ~, ~] = kMeans(k, q, convergence_threshold, im_reshape(:,[2,3]), means_init(:,[2,3]));
+    means = me(:, 1:dim_im_color);
+    labels = repmat(la,1,3);
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%~
 %% NEW IMAGE
 
 fprintf("\nArranging New Custered Image . . .\n")
 
-im_clustered = zeros(size(im,1), size(im,2), dim_im);
-label2mean = zeros(size(im_reshape,1), dim_im);
-label_inds = logical(zeros(size(im_reshape,1), k, dim_im));
+im_clustered = zeros(size(im,1), size(im,2), dim_im_color);
+label2mean = zeros(size(im_reshape,1), dim_im_color);
+label_inds = logical(zeros(size(im_reshape,1), k, dim_im_color));
 
-for i = 1:dim_im
+% Create Clustered Image
+for i = 1:dim_im_color
     [im_clustered(:,:,i), label2mean(:,i), label_inds(:,:,i)] = clstr_im_maker(means(:,i), labels(:,i), k, im_reshape(:,i), size(im(:,:,i)));
 end
 
 im_clustered = uint8(im_clustered);
 
 fprintf("Done\n")
+
+% Write
+clstr_im_name = strcat(pic_name, '__', num2str(k),'_clstrs', '_L', num2str(q), '_loc', num2str(loc_use),'.', file_type);
+fprintf(strcat("\nWriting ",clstr_im_name, " to file"))
+imwrite(im_clustered, clstr_im_name)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%~
 %% PLOTS
@@ -120,23 +187,24 @@ if ( length(size(im)) ~= 2 ) % If it is a color image . . .
     end
 
     % PLOT pixels by each cluster
-    if (components_use == 0)
+    if (components_use == 1)
+        plt_clr = means / 255;
         % Plot each cluster with the mean value as its color
         subplot(2,3,[1,2,3])
         for i = 1:k
-            plt_clr = repmat((means(i)/256),1,3);
+             %repmat((means(i)/256),1,3);
             % Plot only this group:
             scatter3(im_reshape(label_inds(:,i),1), ...
               im_reshape(label_inds(:,i),2), ...
               im_reshape(label_inds(:,i),3), ...
-              [],plt_clr,'o');
+              [],plt_clr(i,:),'o');
             hold on;
         end
         fprintf("*")
-    elseif (components_use == 1)
+    elseif (components_use == 0)
         % Plot each cluster with the mean value as its color
         % For each component (color RGB) of the pixel value
-        for c = 1:dim_im
+        for c = 1:dim_im_color
             subplot(2,3,c)
             for i = 1:k
                 plt_clr = zeros(1,3);
@@ -200,9 +268,6 @@ subplot(2,3,6)
 imshow(im)
 title('Original Image')
 
-% Write
-clstr_im_name = strcat(pic_name, '__', num2str(k),'_clstrs', '_L', num2str(q),'.', file_type);
-fprintf(strcat("\nWriting ",clstr_im_name, " to file"))
-imwrite(im_clustered, clstr_im_name)
+
 
 fprintf("\nDone!!!   ~('o')~\n--------------------\n")
