@@ -69,4 +69,3 @@ https://user-images.githubusercontent.com/114166327/210423325-af58274f-0c5e-407e
 *Figure 5 - Edge detected video frame in each color*
 
 	This program takes a video as an input and outputs a new video where each frame is an edge-detected version of the previous frame. It can either detect edges in each color or use all colors to detect edges.
-
