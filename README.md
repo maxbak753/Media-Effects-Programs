@@ -52,15 +52,23 @@ https://user-images.githubusercontent.com/114166327/210423325-af58274f-0c5e-407e
 
 	These programs simply upscale either a single image or each frame of a video by a specified amount. It does not interpolate between the known and unknown pixels in the upsampled image, it simply expands each pixel value into more pixels. This is different from the upsampling a computer usually does to pixelated images which makes them look blurry. It can be used to make pixel art images larger and still retain their pixelated aesthetic. I have created down-scalers (downsamplers) before but I have not yet added that functionality to these programs.
 
-### Image Clusterer
+### Image/Video Clusterer
 #### Image_Clusterer.m
-<img src="https://github.com/maxbak753/Media-Effects-Programs/blob/master/Images%20%26%20Videos%20%26%20etc/Landscape_RGB.PNG" width=25% height=25%>
-<img src="https://github.com/maxbak753/Media-Effects-Programs/blob/master/Images%20%26%20Videos%20%26%20etc/Landscape_RGB.PNG__2_clstrs_L2.png" width=25% height=25%>
-<img src="https://github.com/maxbak753/Media-Effects-Programs/blob/master/Images%20%26%20Videos%20%26%20etc/Landscape_RGB.PNG__3_clstrs_L2.png" width=25% height=25%>
+https://youtu.be/Pmr0H4p2Zqo <br>
+<img src="https://github.com/maxbak753/Media-Effects-Programs/blob/810300e33d40873cbe0c94dd0faa39f719bd18c1/Images%20&%20Videos%20&%20etc/peppers%200.jpg" width=25% height=25%>
+<img src="https://github.com/maxbak753/Media-Effects-Programs/blob/810300e33d40873cbe0c94dd0faa39f719bd18c1/Images%20&%20Videos%20&%20etc/peppers%201.jpg" width=25% height=25%>
+<img src="https://github.com/maxbak753/Media-Effects-Programs/blob/810300e33d40873cbe0c94dd0faa39f719bd18c1/Images%20&%20Videos%20&%20etc/peppers%202.jpg" width=25% height=25%>
+<img src="https://github.com/maxbak753/Media-Effects-Programs/blob/810300e33d40873cbe0c94dd0faa39f719bd18c1/Images%20&%20Videos%20&%20etc/peppers%203.jpg" width=25% height=25%>
+<img src="https://github.com/maxbak753/Media-Effects-Programs/blob/810300e33d40873cbe0c94dd0faa39f719bd18c1/Images%20&%20Videos%20&%20etc/peppers%204.jpg" width=25% height=25%>
+<img src="https://github.com/maxbak753/Media-Effects-Programs/blob/810300e33d40873cbe0c94dd0faa39f719bd18c1/Images%20&%20Videos%20&%20etc/peppers%205.jpg" width=25% height=25%>
+<img src="https://github.com/maxbak753/Media-Effects-Programs/blob/810300e33d40873cbe0c94dd0faa39f719bd18c1/Images%20&%20Videos%20&%20etc/peppers%206.jpg" width=25% height=25%>
+<img src="https://github.com/maxbak753/Media-Effects-Programs/blob/5e8cb55b5a6cc4ccb00181857f2fc0eb36abe439/Images%20&%20Videos%20&%20etc/peppers.png" width=25% height=25%>
 
-*Figure 4 - Clustered Images: (Top) original, (Middle) 2 clusters, & (Bottom) 3 clusters*
+https://user-images.githubusercontent.com/114166327/216815081-bed9a1b1-711f-4dab-86a1-01bb07ea78f7.mp4
 
-	This program takes an image as an input and outputs a “clustered” version of the image. It uses the k-Means clustering algorithm on the pixel values of the image to cluster the pixels into groups of similar colors, then maps each group to a specific output color in order to get an effect similar to the “posterize” effect in many image/video editors. It essentially re-quantizes the pixel values into groups based on the clustering algorithm.
+*Figure 4 - Clustered Images (1-7), Original Image (8)*
+
+	This program takes an image or video as an input and outputs a “clustered” version of the image. It uses the k-Means clustering algorithm on the pixel values of the image to cluster the pixels into groups based on color & position, then the groups are recolored based on the average color of the cluster region. It can also create a video showing an image being built up from an increasing number of clusters.
 	
 	
 ### Edge Detector (Video)
