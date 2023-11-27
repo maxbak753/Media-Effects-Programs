@@ -162,7 +162,7 @@ if ((bw_rgb == 0) && (bckrnd_BWorRGB == 0))
     %im_pad = bw_pad(1,1) * ones(v_verti, v_horiz);
     im_pad = r_pad * ones(v_verti, v_horiz);
 
-else % if one of them is color ...
+else % if at least one of them is color ...
     im = zeros([dim, 3]);
     blank_image = ones(v_verti, v_horiz);
     im_pad(:,:,1) = (r_pad * blank_image); 
@@ -225,7 +225,7 @@ for f = 1:frames
         im_final((verti_pad_half+1):(verti_pad_half+verti), ...
                  (horiz_pad_half+1):(horiz_pad_half+horiz)) = im(:,:);
 
-    elseif (bckrnd_BWorRGB == 1) % if the background is color
+    else % if at least one of them is color ...
 
         if (bw_rgb == 0) % if the noise is grayscale
             % Make the pixels in RGB & set each RGB value to the same #

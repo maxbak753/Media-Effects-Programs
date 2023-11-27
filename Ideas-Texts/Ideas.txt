@@ -1,0 +1,8 @@
+Ideas:
+
+*- Clustering on an image or video and set the pixels in each cluster equal to the mean (clutering based lossy data compression in slide #52 of lecture 4 in EC 503)
+
+*- Compression effect of audio where each segment is the average or most prominent frequency in that timeframe, so it would at first sound like random beeps and boops but then would turn into a sound (like DWT kind of)
+	- this idea could also be used to make a random 		  beep and boop generator
+
+

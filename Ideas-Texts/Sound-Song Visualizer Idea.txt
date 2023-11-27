@@ -1,0 +1,1 @@
+Take a window of the song and convert it to video by taking the waveform and making, for example, all rows equal to the low frequency waveform in the red channel, then mid frequencies in green, and high in blue. This could be going for fows and columns as well. Something like this may be cool. Each frame would be the window filled arounda certain time around the current sample.

@@ -1,0 +1,11 @@
+Make a dataset of edge detected images by doing edge detection on them
+
+Create a CNN and use this dataset to test it
+
+
+OTHER IDEA:
+create a dataset of images edited in a cool way
+
+make a before -> after dataset
+
+Make CNN that will edit images in a cool way

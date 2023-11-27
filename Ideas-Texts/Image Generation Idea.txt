@@ -1,0 +1,10 @@
+Image Generation Idea:
+
+Create a basic DALL-E 2 type image generator that can only create one type of image
+
+Examples Subjects:
+- red solo cups
+- baseballs
+- dogs
+- red barns
+- et cetera

@@ -1,0 +1,3 @@
+DP Means Image Idea
+
+Use DP-Mean Clustering and create a video where each frame is an iteration of the algorithm. The frame is an image recreated with the cluster centers color value representing all the pixels in the cluster so it would gradually create blocky clusters of the similar image areas.
